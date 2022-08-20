@@ -1,0 +1,24 @@
+SELECT
+    ABS(acc_1 - acc_2)/(acc_1 + acc_2) as acc_diff,
+    CASE
+        WHEN ABS(acc_1 - acc_2)/(acc_1 + acc_2) > 0.1 THEN True ELSE False
+    END as flag
+FROM
+    (SELECT
+            field1 as bot_name,
+            SUM(CASE
+                WHEN deposits.account_id in ('b.acc2', 'a.acc2') THEN deposit ELSE NULL
+            END) as acc_1,
+            SUM(CASE
+                WHEN deposits.account_id in ('a.acc1', 'b.acc3') THEN deposit ELSE NULL
+            END) as acc_2
+            FROM
+                deposits
+            INNER JOIN inv
+            ON deposits.account_id = inv.field2
+            WHERE
+                bot_name == 'bot2'
+            GROUP BY
+                deposits.timestamp, bot_name
+    )
+;

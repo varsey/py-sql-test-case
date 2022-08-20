@@ -1,0 +1,10 @@
+SELECT
+    timestamp, field1,
+    (ROW_NUMBER() OVER ( PARTITION BY timestamp ORDER BY SUM(deposit) DESC) == 1) as num
+FROM
+    deposits
+INNER JOIN inv
+ON deposits.account_id = inv.field2
+GROUP BY
+    deposits.timestamp
+;

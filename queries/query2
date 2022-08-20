@@ -1,0 +1,32 @@
+SELECT bot_name, SUM(income) as total_bot_income
+    FROM
+    /* income for every bot*/
+    (SELECT
+        deposit, (deposit - start_deposit) as income,
+        field1 as bot_name, field3 as bot_start, field4 as bot_end
+    FROM
+        deposits
+    INNER JOIN
+        /* start_deposit at minimum ts*/
+        (SELECT
+            timestamp, t1.account_id, deposit as start_deposit
+        FROM deposits t1
+        INNER JOIN
+            /* minimum ts for every bot */
+            (SELECT
+                    account_id, MIN(timestamp) as min_ts
+            FROM
+                deposits
+            GROUP BY
+                account_id
+            ) AS t2
+        WHERE
+            timestamp == t2.min_ts)
+    INNER JOIN inv
+    ON deposits.account_id = inv.field2
+    WHERE
+        (deposits.timestamp > bot_start) and (deposits.timestamp < bot_end)
+)
+GROUP BY
+    bot_name
+;

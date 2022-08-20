@@ -1,0 +1,15 @@
+SELECT
+    SUM(deposit), bot_name
+FROM
+    (SELECT
+        deposit, field1 as bot_name, field3 as bot_start, field4 as bot_end
+    FROM
+        deposits
+    INNER JOIN inv
+    ON deposits.account_id = inv.field2
+    WHERE
+        (timestamp > bot_start) and (timestamp < bot_end)
+    )
+GROUP BY
+    bot_name
+;
